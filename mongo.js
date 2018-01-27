@@ -5,7 +5,7 @@ const url = 'mongodb://fullstack:jek-taysikasa@ds117158.mlab.com:17158/jek-fulls
 mongoose.connect(url);
 mongoose.Promise = global.Promise;
 
-const Numero = mongoose.model('Numero', {
+const Numero = mongoose.model('Person', {
   name: String,
   number: String
 })

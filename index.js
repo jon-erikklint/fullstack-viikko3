@@ -3,10 +3,13 @@ const app = express();
 
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const cors = require('cors');
+
+const Person = require('./models/person');
+
 morgan.token('body-json', (request, response) => {
   return JSON.stringify(request.body);
 })
-const cors = require('cors');
 
 app.use(express.static('build'))
 app.use(cors());
@@ -32,7 +35,7 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons);
+  Person.find({}).then(result => response.json(result.map(Person.format)));
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -69,11 +72,10 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons', (request, response) => {
   let body = request.body;
 
-  let person = {
+  let person = new Person({
     name: body.name,
-    number: body.number,
-    id: Math.floor(Math.random() * 1000000)
-  };
+    number: body.number
+  });
 
   let errors = [];
   if(person.name == null) {
@@ -81,16 +83,15 @@ app.post('/api/persons', (request, response) => {
   }
   if(person.number == null) {
     errors.push('number required')
-  }
+  }/*
   if(persons.find(existing => existing.name === person.name)) {
     errors.push('person already exists')
-  }
+  }*/
 
   if (errors.length > 0) {
     response.status(400).json(errors.map(errorMessage => ({error: errorMessage}) ));
   } else {
-    persons.push(person);
-    response.json(person);
+    person.save(result => response.json(Person.format(person)));
   }
 })
 
