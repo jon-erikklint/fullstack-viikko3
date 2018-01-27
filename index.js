@@ -16,57 +16,54 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(morgan(':method :url :body-json :status :res[content-length] - :response-time ms'));
 
-let persons = [
-  {
-    name: "Matti Manhanen",
-    number: "050-0500500",
-    id: 1
-  },
-  {
-    name: "Sauli Siinistö",
-    number: "040-0400400",
-    id: 2
-  },
-  {
-    name: "Pekka Paavisto",
-    number: "030-0300300",
-    id: 3
-  }
-]
-
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(result => response.json(result.map(Person.format)));
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  let id = Number(request.params.id);
+  let id = request.params.id;
 
-  let person = persons.find(person => person.id === id);
-
-  if(person) {
-    response.json(person);
-  } else {
-    response.sendStatus(404).end()
-  }
+  Person.findById(id)
+    .then(result => {
+      if(result) {
+        response.json(Person.format(result));
+      } else {
+        response.sendStatus(404).end();
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      response.sendStatus(400).end();
+    })
 })
 
 app.get('/info', (request, response) => {
-  response.send(
-    `<p>
-      puhelinluettelossa ${persons.length} henkilön tiedot
-    </p>
-    <p>
-      ${new Date()}
-    </p>`
-  );
+  Person.find({})
+    .then(result => {
+      response.send(
+        `<p>
+          puhelinluettelossa ${result.length} henkilön tiedot
+        </p>
+        <p>
+          ${new Date()}
+        </p>`
+      );
+    })
+    .catch(error => {
+      console.log(error);
+      response.sendStatus(500).end();
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  let id = Number(request.params.id);
+  let id = request.params.id;
 
-  persons = persons.filter(person => person.id !== id);
-
-  response.sendStatus(204).end();
+  Person.findByIdAndRemove(id)
+    .then(result => response.sendStatus(204).end())
+    .catch(error => {
+      console.log(error);
+      response.statusCode(400)
+    })
 })
 
 app.post('/api/persons', (request, response) => {
@@ -83,17 +80,36 @@ app.post('/api/persons', (request, response) => {
   }
   if(person.number == null) {
     errors.push('number required')
-  }/*
-  if(persons.find(existing => existing.name === person.name)) {
-    errors.push('person already exists')
-  }*/
+  }
 
   if (errors.length > 0) {
     response.status(400).json(errors.map(errorMessage => ({error: errorMessage}) ));
   } else {
-    person.save(result => response.json(Person.format(person)));
+    person.save(result => response.json(Person.format(person)))
+      .catch(error => {
+        console.log(error);
+        response.sendStatus(400).end();
+      });
   }
 })
+
+app.put('/api/persons/:id', (request, response) => {
+  let id = request.params.id;
+  let body = request.body;
+
+  console.log(id, body);
+
+  Person.findByIdAndUpdate(id, {name: body.name, number: body.number}, {new: true})
+    .then(result => {
+      console.log(result)
+      response.json(Person.format(result))})
+    .catch(error => {
+      console.log(error);
+      response.sendStatus(400).end();
+    });
+})
+
+
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
