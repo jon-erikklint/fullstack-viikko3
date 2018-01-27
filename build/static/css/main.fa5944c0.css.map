@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.css"],"names":[],"mappings":"AAAA,cACE,uBACA,aACA,kBACA,qBAAwB","file":"static/css/main.fa5944c0.css","sourcesContent":[".notification {\n  background-color: green;\n  padding: 10px;\n  margin-bottom: 3px;\n  border: 1px solid black;\n}\n\n\n// WEBPACK FOOTER //\n// ./src/index.css"],"sourceRoot":""}

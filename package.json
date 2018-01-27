@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/jon-erikklint/fullstack-viikko3#readme",
   "dependencies": {
+    "cors": "^2.8.4",
     "express": "^4.16.2",
     "morgan": "^1.9.0"
   },
