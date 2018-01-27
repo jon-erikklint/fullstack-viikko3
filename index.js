@@ -2,8 +2,13 @@ const express = require('express');
 const app = express();
 
 const bodyParser = require('body-parser');
+const morgan = require('morgan');
+morgan.token('body-json', (request, response) => {
+  return JSON.stringify(request.body);
+})
 
 app.use(bodyParser.json());
+app.use(morgan(':method :url :body-json :status :res[content-length] - :response-time ms'));
 
 let persons = [
   {
@@ -28,7 +33,7 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  let id = Number(request.param('id'));
+  let id = Number(request.params.id);
 
   let person = persons.find(person => person.id === id);
 
@@ -51,7 +56,7 @@ app.get('/info', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  let id = Number(request.param('id'));
+  let id = Number(request.params.id);
 
   persons = persons.filter(person => person.id !== id);
 
