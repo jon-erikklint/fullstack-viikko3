@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
 
 if ( process.env.NODE_ENV !== 'production' ) {
-  require('dotenv').config();
+  require('dotenv').config()
 }
 
-const url = process.env.MONGODB_URL;
+const url = process.env.MONGODB_URL
 
-mongoose.connect(url);
-mongoose.Promise = global.Promise;
+mongoose.connect(url)
+mongoose.Promise = global.Promise
 
 const PersonSchema = mongoose.Schema({
   name: String,
@@ -24,4 +24,4 @@ PersonSchema.statics.format = function(note) {
 
 const Person = mongoose.model('Person', PersonSchema)
 
-module.exports = Person;
+module.exports = Person
