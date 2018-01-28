@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
 
-const url = 'mongodb://fullstack:jek-taysikasa@ds117158.mlab.com:17158/jek-fullstack';
+if ( process.env.NODE_ENV !== 'production' ) {
+  require('dotenv').config();
+}
+
+const url = process.env.MONGODB_URL;
 
 mongoose.connect(url);
 mongoose.Promise = global.Promise;
