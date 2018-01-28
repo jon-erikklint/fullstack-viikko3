@@ -75,16 +75,15 @@ app.post('/api/persons', (request, response) => {
   });
 
   let errors = [];
-  if(person.name == null) {
+  if(person.name == null || person.name === "") {
     errors.push('name required')
   }
-  if(person.number == null) {
+  if(person.number == null || person.number === "") {
     errors.push('number required')
   }
 
   if (errors.length > 0) {
-    response.status(400).json(errors.map(errorMessage => ({error: errorMessage}) )
-  );
+    response.status(400).json(errors.map(errorMessage => ({error: errorMessage}) ))
   } else {
     Person.findOne({name: body.name})
       .then(result => {
