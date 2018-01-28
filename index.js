@@ -83,12 +83,23 @@ app.post('/api/persons', (request, response) => {
   }
 
   if (errors.length > 0) {
-    response.status(400).json(errors.map(errorMessage => ({error: errorMessage}) ));
+    response.status(400).json(errors.map(errorMessage => ({error: errorMessage}) )
+  );
   } else {
-    person.save(result => response.json(Person.format(person)))
+    Person.findOne({name: body.name})
+      .then(result => {
+        if(result) {
+          throw {error: "nimi jo puhelinluettelossa"}
+        } else {
+          return person.save();
+        }
+      })
+      .then(result => {
+        response.json(Person.format(person))
+      })
       .catch(error => {
         console.log(error);
-        response.sendStatus(400).end();
+        response.status(400).json(error);
       });
   }
 })
@@ -97,11 +108,8 @@ app.put('/api/persons/:id', (request, response) => {
   let id = request.params.id;
   let body = request.body;
 
-  console.log(id, body);
-
   Person.findByIdAndUpdate(id, {name: body.name, number: body.number}, {new: true})
     .then(result => {
-      console.log(result)
       response.json(Person.format(result))})
     .catch(error => {
       console.log(error);
